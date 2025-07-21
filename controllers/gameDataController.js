@@ -1,3 +1,4 @@
+// controllers/gameDataController.js
 const GameDataService = require('../services/GameDataService');
 const logger = require('../utils/logger');
 
@@ -9,14 +10,20 @@ class GameDataController {
       res.json({
         success: true,
         data: skins,
-        count: skins.length
+        count: skins ? skins.length : 0,
+        cached: true
       });
 
       logger.info('All skins data retrieved');
 
     } catch (error) {
       logger.error('Get all skins error:', error);
-      next(error);
+      
+      res.status(503).json({
+        success: false,
+        message: 'Unable to fetch skins data at the moment',
+        error: 'Service temporarily unavailable'
+      });
     }
   }
 
@@ -27,14 +34,20 @@ class GameDataController {
       res.json({
         success: true,
         data: bundles,
-        count: bundles.length
+        count: bundles ? bundles.length : 0,
+        cached: true
       });
 
       logger.info('All bundles data retrieved');
 
     } catch (error) {
       logger.error('Get all bundles error:', error);
-      next(error);
+      
+      res.status(503).json({
+        success: false,
+        message: 'Unable to fetch bundles data at the moment',
+        error: 'Service temporarily unavailable'
+      });
     }
   }
 
@@ -51,6 +64,27 @@ class GameDataController {
 
     } catch (error) {
       logger.error('Get client version error:', error);
+      
+      res.status(503).json({
+        success: false,
+        message: 'Unable to fetch version data at the moment',
+        error: 'Service temporarily unavailable'
+      });
+    }
+  }
+
+  async getGameDataHealth(req, res, next) {
+    try {
+      const healthStatus = GameDataService.getHealthStatus();
+      
+      res.json({
+        success: true,
+        data: healthStatus,
+        message: healthStatus.initialized ? 'Game data service is healthy' : 'Game data service is initializing'
+      });
+
+    } catch (error) {
+      logger.error('Get game data health error:', error);
       next(error);
     }
   }

@@ -3,105 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valorant Store API Test</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Valorant Store API - Testing Interface</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .valorant-red {
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+        }
+        
+        .valorant-blue {
+            background: linear-gradient(135deg, #0f1419, #1e2328);
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: #f8f8f2;
+        }
+        
+        .success-border {
+            border-left: 4px solid #10b981;
+        }
+        
+        .error-border {
+            border-left: 4px solid #ef4444;
+        }
+
+        .account-card {
+            transition: all 0.3s ease;
+        }
+        
+        .account-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff4655, #ff6b7a);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 70, 85, 0.4);
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🎯 Valorant Store API Tester</h1>
-            <p>Test your Valorant Store Backend API</p>
-        </header>
-
-        <!-- API Configuration -->
-        <section class="config-section">
-            <h3>API Configuration</h3>
-            <div class="input-group">
-                <label for="apiUrl">API Base URL:</label>
-                <input type="text" id="apiUrl" value="http://localhost:3000/api" placeholder="http://localhost:3000/api">
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <!-- Header -->
+    <nav class="glass p-4 mb-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-crosshairs text-2xl valorant-red"></i>
+                <h1 class="text-2xl font-bold">Valorant Store API</h1>
+                <span class="px-3 py-1 bg-green-500 text-xs rounded-full">Testing Interface</span>
             </div>
-        </section>
-
-        <!-- Authentication Section -->
-        <section class="auth-section">
-            <h3>🔐 Authentication</h3>
-            <div class="auth-status" id="authStatus">
-                <span class="status-indicator offline">Offline</span>
-                <span id="authMessage">Not authenticated</span>
+            <div class="flex items-center space-x-4">
+                <span id="serverStatus" class="px-3 py-1 bg-yellow-500 text-xs rounded-full">
+                    <i class="fas fa-circle-notch loading"></i> Checking...
+                </span>
+                <button onclick="checkServerHealth()" class="p-2 glass rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
-            
-            <div class="auth-form">
-                <div class="input-group">
-                    <label for="username">Riot Username:</label>
-                    <input type="text" id="username" placeholder="your_username">
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4">
+        <!-- Alert Area -->
+        <div id="alertArea" class="mb-6"></div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Authentication Panel -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- OAuth Login Section -->
+                <div class="glass rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-sign-in-alt mr-2 text-blue-400"></i>
+                        OAuth Authentication (No Username/Password)
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="generateAuthUrl()" class="btn-primary text-white px-6 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-link mr-2"></i>
+                                Generate Auth URL
+                            </button>
+                            <button onclick="simulateCallback()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-check mr-2"></i>
+                                Simulate Callback
+                            </button>
+                            <button onclick="clearAuth()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-trash mr-2"></i>
+                                Clear Auth
+                            </button>
+                        </div>
+
+                        <!-- Auth URL Display -->
+                        <div id="authUrlSection" class="hidden">
+                            <label class="block text-sm font-medium mb-2">Generated Auth URL:</label>
+                            <div class="glass p-3 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <input type="text" id="authUrl" readonly class="bg-transparent flex-1 text-sm text-blue-300 outline-none">
+                                    <button onclick="copyAuthUrl()" class="ml-2 text-blue-400 hover:text-blue-300">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                In real app: Open this URL in WebView, complete Riot login, then extract tokens from redirect URL
+                            </p>
+                        </div>
+
+                        <!-- Callback URL Input -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Callback URL (with tokens):</label>
+                            <textarea 
+                                id="callbackUrl" 
+                                placeholder="https://playvalorant.com/opt_in#access_token=eyJ...&id_token=eyJ..."
+                                class="w-full glass p-3 rounded-lg text-sm resize-none outline-none focus:ring-2 focus:ring-blue-500"
+                                rows="3"
+                            ></textarea>
+                            <button onclick="processCallback()" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-paper-plane mr-1"></i>
+                                Process Callback
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="password">Riot Password:</label>
-                    <input type="password" id="password" placeholder="your_password">
-                </div>
-                <div class="button-group">
-                    <button id="loginBtn" class="btn btn-primary">Login</button>
-                    <button id="logoutBtn" class="btn btn-secondary" disabled>Logout</button>
-                    <button id="refreshBtn" class="btn btn-info" disabled>Refresh Session</button>
-                </div>
-            </div>
 
-            <div class="user-info" id="userInfo" style="display: none;">
-                <h4>User Profile:</h4>
-                <pre id="userProfile"></pre>
-            </div>
-        </section>
-
-        <!-- API Testing Section -->
-        <section class="api-section">
-            <h3>🧪 API Testing</h3>
-            
-            <div class="api-controls">
-                <div class="button-group">
-                    <button id="getDailyStore" class="btn btn-success" disabled>Get Daily Store</button>
-                    <button id="getStoreHistory" class="btn btn-info" disabled>Get Store History</button>
-                    <button id="getFavorites" class="btn btn-warning" disabled>Get Favorites</button>
-                </div>
-                
-                <div class="button-group">
-                    <button id="getAllSkins" class="btn btn-secondary">Get All Skins</button>
-                    <button id="getAllBundles" class="btn btn-secondary">Get All Bundles</button>
-                    <button id="healthCheck" class="btn btn-info">Health Check</button>
-                </div>
-            </div>
-
-            <!-- Add to Favorites Test -->
-            <div class="favorites-test">
-                <h4>Favorites Test:</h4>
-                <div class="input-group inline">
-                    <input type="text" id="skinIdInput" placeholder="Enter Skin UUID">
-                    <button id="addFavorite" class="btn btn-sm btn-success" disabled>Add Favorite</button>
-                    <button id="removeFavorite" class="btn btn-sm btn-danger" disabled>Remove Favorite</button>
+                <!-- API Testing Section -->
+                <div class="glass rounded-xl p-6">
+                    <h2 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-cogs mr-2 text-purple-400"></i>
+                        API Testing
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="getProfile()" class="glass p-4 rounded-lg hover:bg-white hover:bg-opacity-10 text-left">
+                            <i class="fas fa-user text-green-400 mb-2"></i>
+                            <div class="font-medium">Get Profile</div>
+                            <div class="text-xs text-gray-400">Retrieve current user info</div>
+                        </button>
+                        
+                        <button onclick="refreshData()" class="glass p-4 rounded-lg hover:bg-white hover:bg-opacity-10 text-left">
+                            <i class="fas fa-sync text-blue-400 mb-2"></i>
+                            <div class="font-medium">Refresh Data</div>
+                            <div class="text-xs text-gray-400">Update balance & XP</div>
+                        </button>
+                        
+                        <button onclick="getAllSessions()" class="glass p-4 rounded-lg hover:bg-white hover:bg-opacity-10 text-left">
+                            <i class="fas fa-users text-yellow-400 mb-2"></i>
+                            <div class="font-medium">All Sessions</div>
+                            <div class="text-xs text-gray-400">Multi-account list</div>
+                        </button>
+                        
+                        <button onclick="logout()" class="glass p-4 rounded-lg hover:bg-white hover:bg-opacity-10 text-left">
+                            <i class="fas fa-sign-out-alt text-red-400 mb-2"></i>
+                            <div class="font-medium">Logout</div>
+                            <div class="text-xs text-gray-400">End current session</div>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Response Section -->
-        <section class="response-section">
-            <h3>📋 API Response</h3>
-            <div class="response-controls">
-                <button id="clearResponse" class="btn btn-sm btn-secondary">Clear</button>
-                <button id="copyResponse" class="btn btn-sm btn-info">Copy</button>
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Current Session -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-id-card mr-2 text-green-400"></i>
+                        Current Session
+                    </h3>
+                    <div id="currentSession" class="text-sm text-gray-400">
+                        No active session
+                    </div>
+                </div>
+
+                <!-- Active Accounts -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-user-friends mr-2 text-blue-400"></i>
+                        Active Accounts
+                    </h3>
+                    <div id="activeAccounts" class="space-y-3">
+                        <div class="text-sm text-gray-400">No accounts loaded</div>
+                    </div>
+                </div>
+
+                <!-- Server Info -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-server mr-2 text-purple-400"></i>
+                        Server Info
+                    </h3>
+                    <div id="serverInfo" class="text-sm space-y-2">
+                        <div class="text-gray-400">Loading...</div>
+                    </div>
+                </div>
             </div>
-            <pre id="responseArea">No response yet...</pre>
-        </section>
+        </div>
 
-        <!-- Store Display Section -->
-        <section class="store-section" id="storeSection" style="display: none;">
-            <h3>🛒 Daily Store</h3>
-            <div class="store-info" id="storeInfo"></div>
-            <div class="store-items" id="storeItems"></div>
-        </section>
+        <!-- Response Area -->
+        <div class="mt-8 glass rounded-xl p-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fas fa-terminal mr-2 text-cyan-400"></i>
+                API Response
+                <button onclick="clearResponse()" class="ml-auto text-xs bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded">
+                    Clear
+                </button>
+            </h3>
+            <div id="responseArea" class="code-block">
+                <div class="text-gray-500">API responses will appear here...</div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="spinner"></div>
-            <p>Loading...</p>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="glass rounded-xl p-8 text-center">
+            <i class="fas fa-circle-notch loading text-4xl text-blue-400 mb-4"></i>
+            <div class="text-lg">Processing...</div>
         </div>
     </div>
 

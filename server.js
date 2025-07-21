@@ -1,5 +1,6 @@
 // server.js
 const express = require('express');
+const gameDataRoutes = require('./routes/gameData');
 
 // Check if modules exist before requiring
 let cors, helmet, rateLimit, NodeCache;
@@ -33,6 +34,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.use('/api/game-data', gameDataRoutes);
 
 // Rate limiting dengan config yang lebih ketat untuk auth endpoints
 const authLimiter = rateLimit({

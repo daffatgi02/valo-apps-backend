@@ -1,11 +1,18 @@
 // config/constants.js
 module.exports = {
   RIOT_URLS: {
+    // Authentication URLs
     AUTH_AUTHORIZE: 'https://auth.riotgames.com/authorize',
     AUTH_USERINFO: 'https://auth.riotgames.com/userinfo',
     ENTITLEMENTS: 'https://entitlements.auth.riotgames.com/api/token/v1',
-    STORE: 'https://pd.{region}.a.pvp.net/store/v2/storefront/{userId}',
+    
+    // Game API URLs
     VERSION: 'https://valorant-api.com/v1/version',
+    SKINS: 'https://valorant-api.com/v1/weapons/skins',
+    BUNDLES: 'https://valorant-api.com/v1/bundles',
+    
+    // Player-specific URLs (require placeholders)
+    STORE: 'https://pd.{region}.a.pvp.net/store/v2/storefront/{userId}',
     BALANCE: 'https://pd.{region}.a.pvp.net/store/v1/wallet/{userId}',
     ACCOUNT_XP: 'https://pd.{region}.a.pvp.net/account-xp/v1/players/{userId}',
     PLAYER_LOADOUT: 'https://pd.{region}.a.pvp.net/personalization/v2/players/{userId}/playerloadout'
@@ -21,6 +28,13 @@ module.exports = {
 
   X_RIOT_CLIENT_PLATFORM: "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
 
+  CLIENT_PLATFORM: {
+    platformType: "PC",
+    platformOS: "Windows",
+    platformOSVersion: "10.0.19042.1.256.64bit",
+    platformChipset: "Unknown"
+  },
+
   JWT_CONFIG: {
     SECRET: process.env.JWT_SECRET || 'your-super-secret-key',
     EXPIRES_IN: '24h'
@@ -33,8 +47,10 @@ module.exports = {
   },
 
   CACHE_TTL: {
-    TOKENS: 24 * 60 * 60, // 24 hours
+    SKINS: 24 * 60 * 60, // 24 hours
     BALANCE: 5 * 60, // 5 minutes
-    USER_INFO: 60 * 60 // 1 hour
+    USER_INFO: 60 * 60, // 1 hour
+    VERSION: 60 * 60, // 1 hour
+    TOKENS: 24 * 60 * 60 // 24 hours
   }
 };
