@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorant Store API Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Valorant Store API Tester</h1>
+            <p>Test your Valorant Store Backend API</p>
+        </header>
+
+        <!-- API Configuration -->
+        <section class="config-section">
+            <h3>API Configuration</h3>
+            <div class="input-group">
+                <label for="apiUrl">API Base URL:</label>
+                <input type="text" id="apiUrl" value="http://localhost:3000/api" placeholder="http://localhost:3000/api">
+            </div>
+        </section>
+
+        <!-- Authentication Section -->
+        <section class="auth-section">
+            <h3>🔐 Authentication</h3>
+            <div class="auth-status" id="authStatus">
+                <span class="status-indicator offline">Offline</span>
+                <span id="authMessage">Not authenticated</span>
+            </div>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <label for="username">Riot Username:</label>
+                    <input type="text" id="username" placeholder="your_username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Riot Password:</label>
+                    <input type="password" id="password" placeholder="your_password">
+                </div>
+                <div class="button-group">
+                    <button id="loginBtn" class="btn btn-primary">Login</button>
+                    <button id="logoutBtn" class="btn btn-secondary" disabled>Logout</button>
+                    <button id="refreshBtn" class="btn btn-info" disabled>Refresh Session</button>
+                </div>
+            </div>
+
+            <div class="user-info" id="userInfo" style="display: none;">
+                <h4>User Profile:</h4>
+                <pre id="userProfile"></pre>
+            </div>
+        </section>
+
+        <!-- API Testing Section -->
+        <section class="api-section">
+            <h3>🧪 API Testing</h3>
+            
+            <div class="api-controls">
+                <div class="button-group">
+                    <button id="getDailyStore" class="btn btn-success" disabled>Get Daily Store</button>
+                    <button id="getStoreHistory" class="btn btn-info" disabled>Get Store History</button>
+                    <button id="getFavorites" class="btn btn-warning" disabled>Get Favorites</button>
+                </div>
+                
+                <div class="button-group">
+                    <button id="getAllSkins" class="btn btn-secondary">Get All Skins</button>
+                    <button id="getAllBundles" class="btn btn-secondary">Get All Bundles</button>
+                    <button id="healthCheck" class="btn btn-info">Health Check</button>
+                </div>
+            </div>
+
+            <!-- Add to Favorites Test -->
+            <div class="favorites-test">
+                <h4>Favorites Test:</h4>
+                <div class="input-group inline">
+                    <input type="text" id="skinIdInput" placeholder="Enter Skin UUID">
+                    <button id="addFavorite" class="btn btn-sm btn-success" disabled>Add Favorite</button>
+                    <button id="removeFavorite" class="btn btn-sm btn-danger" disabled>Remove Favorite</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Response Section -->
+        <section class="response-section">
+            <h3>📋 API Response</h3>
+            <div class="response-controls">
+                <button id="clearResponse" class="btn btn-sm btn-secondary">Clear</button>
+                <button id="copyResponse" class="btn btn-sm btn-info">Copy</button>
+            </div>
+            <pre id="responseArea">No response yet...</pre>
+        </section>
+
+        <!-- Store Display Section -->
+        <section class="store-section" id="storeSection" style="display: none;">
+            <h3>🛒 Daily Store</h3>
+            <div class="store-info" id="storeInfo"></div>
+            <div class="store-items" id="storeItems"></div>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

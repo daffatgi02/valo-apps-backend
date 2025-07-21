@@ -1,0 +1,8 @@
+# .gitignore
+node_modules/
+logs/
+*.log
+.env
+auth/
+save/
+*.json
